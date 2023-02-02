@@ -35,10 +35,14 @@ datasets <- dhs_datasets(surveyIds = surveys$SurveyId,
                          fileFormat = "flat")
 head(datasets, n=20)
 # desired filename = SLHR7AFL.ZIP
+```
 
+```{r}
 # download actual datasets
 downloads <- get_datasets("SLHR7AFL.ZIP")
+```
 
+```{r}
 # read in the dataset
 slhr2019 <- readRDS(downloads$SLHR7AFL)
 head(slhr2019) # 3455 columns! Yikes. 
@@ -47,9 +51,13 @@ head(slhr2019) # 3455 columns! Yikes.
 var_labels <- get_variable_labels(slhr2019)
 head(var_labels) # 3455 rows now, just two columns, variable and description
 
-# export data and labels to CSV for visual inspection and workability
-write.csv(var_labels, "C:\\Users\\ilyon\\Documents\\code\\csci5622\\module1\\exports\\var_labels.csv")
-write.csv(slhr2019, "C:\\Users\\ilyon\\Documents\\code\\csci5622\\module1\\exports\\slhr2019.csv")
+# export data and labels to CSV for visual inspection and workability on PC
+# write.csv(var_labels, "C:\\Users\\ilyon\\Documents\\code\\csci5622\\module1\\exports\\var_labels.csv")
+# write.csv(slhr2019, "C:\\Users\\ilyon\\Documents\\code\\csci5622\\module1\\exports\\slhr2019.csv")
+
+# export data and labels to CSV for visual inspection and workability on Mac
+write.csv(var_labels, "./exports/var_labels.csv")
+write.csv(slhr2019, "./exports/slhr2019.csv")
 ```
 
 ### Do it without the package rdhs
@@ -58,9 +66,9 @@ library(httr)
 
 # r <- GET("https://api.dhsprogram.com/rest/dhs/datasets/SL")
 # r <- GET("https://api.dhsprogram.com/rest/dhs/datasets/SL?fileType=flat&f=csv")
-r <- GET("https://api.dhsprogram.com/rest/dhs/datasets/SL")
-r
-content(r)
+# r <- GET("https://api.dhsprogram.com/rest/dhs/datasets/SL")
+# r
+# content(r)
 ```
 
 ## Clean Data
