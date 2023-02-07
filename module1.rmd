@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # load needed libraries
 library(rdhs)
 library(tidyverse)
+library(ggplot2)
 
 ```
 ## To Do List
@@ -141,12 +142,20 @@ fridge <- sum(sl19keep$hv209 == "1")
 bicycle <- sum(sl19keep$hv210 == "1")
 motorcycle <- sum(sl19keep$hv211 == "1")
 car <- sum(sl19keep$hv212 == "1")
+v <- c(elec,radio,tele,fridge,bicycle,motorcycle,car)
+labs <- c("Electricity", "Radio", "Television", "Fridge", "Bicycle", "Motorcyle", "Car")
 
-pie(c(elec, n-elec), labels = c("Yes", "No"), main="Electricity")
-pie(c(radio, n-radio), labels = c("Yes", "No"), main="Radio")
-pie(c(tele, n-tele), labels = c("Yes", "No"), main="Television")
-pie(c(fridge, n-fridge), labels = c("Yes", "No"), main="Fridge")
-pie(c(bicycle, n-bicycle), labels = c("Yes", "No"), main="Bicycle")
-pie(c(motorcycle, n-motorcycle), labels = c("Yes", "No"), main="Motorcycle")
-pie(c(car, n-car), labels = c("Yes", "No"), main="Car")
+pie(c(elec, n-elec), labels = c("Yes", "No"), main="Have Electricity", col=c("violet","white"))
+pie(c(radio, n-radio), labels = c("Yes", "No"), main="Have Radio", col=c("violet","white"))
+pie(c(tele, n-tele), labels = c("Yes", "No"), main="Have Television", col=c("violet","white"))
+pie(c(fridge, n-fridge), labels = c("Yes", "No"), main="Have Fridge", col=c("violet","white"))
+pie(c(bicycle, n-bicycle), labels = c("Yes", "No"), main="Have Bicycle", col=c("violet","white"))
+pie(c(motorcycle, n-motorcycle), labels = c("Yes", "No"), main="Have Motorcycle", col=c("violet","white"))
+pie(c(car, n-car), labels = c("Yes", "No"), main="Have Car", col=c("violet","white"))
+
+pctdf <- data.frame(label=labs,
+                    values=v)
+colnames(pctdf) <- labs
+ggplot(pctdf) +
+  geom_bar(aes(x=pctdf$))
 ```
