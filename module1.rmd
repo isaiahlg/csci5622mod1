@@ -13,11 +13,10 @@ knitr::opts_chunk$set(echo = TRUE)
 # load needed libraries
 library(rdhs)
 library(tidyverse)
-library(ggplot2)
-
 ```
 ## To Do List
 - Add ordering to certain factor columns
+- Filter out unknown values such as 999
 - Pull old data from Sierra Leone
 - Pull data from other countries
 
@@ -122,19 +121,74 @@ saveRDS(sl19keep, "./exports/sl19keep.rds")
 ## Summarize data
 
 ```{r}
+# import data
 sl19keep <- readRDS("./exports/sl19keep.rds")
-head(sl19keep)
+n <- nrow(sl19keep)
+```
 
-hist(sl19keep$hv012, main="# Household Members Dejure") # dejure household members
-hist(sl19keep$hv013, main="# Household Members Defacto") # defacto household members
-hist(log(sl19keep$hv012))
-hist(sqrt(sl19keep$hv012))
+Histograms
+```{r}
+# histograms
 
 hist(sl19keep$hv040, main="Altitude (m)") # altitude in meters
 plot(sl19keep$hv024, main="Region") # region
 plot(sl19keep$hv045c, main="Native Language")
 
-n <- nrow(sl19keep)
+ilg_hist <- function(x, bins, label, fill) {
+  return(ggplot() + 
+      geom_histogram(aes(x), color="black", fill=fill, bins=bins) +
+      xlab(label) +
+      ylab("Count") +
+      ggtitle(label) +
+      theme_bw()
+  )
+}
+
+
+household <- ilg_hist(sl19keep$hv012, 33, "# Household Members", "purple")
+household
+women <- ilg_hist(sl19keep$hv010, 11, "# Women aged 15-49", "purple")
+women
+men <- ilg_hist(sl19keep$hv011, 11, "# Men aged 15-49", "purple")
+men
+children <- ilg_hist(sl19keep$hv014, 10, "# Children under 5 y.o.", "purple")
+children
+
+altitude <- ilg_hist(sl19keep$hv040, 30, "Altitude", "blue")
+altitude
+
+timetowater <- ilg_hist(sl19keep$hv204, 30, "Time to Water Source", "darkgreen")
+timetowater # filter out high "unknowns"
+```
+
+Bar Charts
+```{r}
+
+ilg_bar <- function(x, label, fill) {
+  return(ggplot() + 
+      geom_bar(aes(x), color="black", fill=fill) +
+      xlab(label) +
+      ylab("Count") +
+      ggtitle(label) +
+      theme_bw()
+  )
+}
+
+region <- ilg_bar(sl19keep$hv024, "Region", "blue")
+region
+
+language <- ilg_bar(sl19keep$hv045c, "Language", "blue")
+language
+
+watersource <- ilg_bar(sl19keep$hv201, "Source of Drinking Water", "darkgreen")
+watersource
+
+
+```
+
+Pie Charts
+```{r}
+# pie charts of asset ownership
 elec <- sum(sl19keep$hv206 == "1")
 radio <- sum(sl19keep$hv207 == "1")
 tele <- sum(sl19keep$hv208 == "1")
@@ -142,20 +196,29 @@ fridge <- sum(sl19keep$hv209 == "1")
 bicycle <- sum(sl19keep$hv210 == "1")
 motorcycle <- sum(sl19keep$hv211 == "1")
 car <- sum(sl19keep$hv212 == "1")
-v <- c(elec,radio,tele,fridge,bicycle,motorcycle,car)
-labs <- c("Electricity", "Radio", "Television", "Fridge", "Bicycle", "Motorcyle", "Car")
 
-pie(c(elec, n-elec), labels = c("Yes", "No"), main="Have Electricity", col=c("violet","white"))
-pie(c(radio, n-radio), labels = c("Yes", "No"), main="Have Radio", col=c("violet","white"))
-pie(c(tele, n-tele), labels = c("Yes", "No"), main="Have Television", col=c("violet","white"))
-pie(c(fridge, n-fridge), labels = c("Yes", "No"), main="Have Fridge", col=c("violet","white"))
-pie(c(bicycle, n-bicycle), labels = c("Yes", "No"), main="Have Bicycle", col=c("violet","white"))
-pie(c(motorcycle, n-motorcycle), labels = c("Yes", "No"), main="Have Motorcycle", col=c("violet","white"))
-pie(c(car, n-car), labels = c("Yes", "No"), main="Have Car", col=c("violet","white"))
+pie(c(elec, n-elec), labels = c("Yes", "No"), main="Have Electricity", col=c("purple","white"))
+pie(c(radio, n-radio), labels = c("Yes", "No"), main="Have Radio", col=c("purple","white"))
+pie(c(tele, n-tele), labels = c("Yes", "No"), main="Have Television", col=c("purple","white"))
+pie(c(fridge, n-fridge), labels = c("Yes", "No"), main="Have Fridge", col=c("purple","white"))
+pie(c(bicycle, n-bicycle), labels = c("Yes", "No"), main="Have Bicycle", col=c("purple","white"))
+pie(c(motorcycle, n-motorcycle), labels = c("Yes", "No"), main="Have Motorcycle", col=c("purple","white"))
+pie(c(car, n-car), labels = c("Yes", "No"), main="Have Car", col=c("purple","white"))
+```
 
-pctdf <- data.frame(label=labs,
-                    values=v)
-colnames(pctdf) <- labs
-ggplot(pctdf) +
-  geom_bar(aes(x=pctdf$))
+Multivariable Bar Chart
+```{r}
+# bar chart of asset ownership
+counts <- c(elec,radio,tele,fridge,bicycle,motorcycle,car)
+labels <- c("Electricity", "Radio", "Television", "Fridge", "Bicycle", "Motorcyle", "Car")
+assets <- data.frame(asset=labels, count=counts)
+ggplot(assets) +
+  geom_bar(aes(y=count, x=asset), fill="purple", stat='identity') +
+  ggtitle('Asset Ownership')+
+  xlab('Asset') +
+  ylab('Count') +
+  ylim(0,15000) + 
+  theme_bw() +
+  scale_color_brewer(palette="Dark2")+
+  geom_hline(yintercept=n, style="dashed", color="gray")
 ```
